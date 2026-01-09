@@ -547,7 +547,7 @@
     <div class="container">
         <div class="header">
             <h1>🏆 MAMG Challenger Leaderboard</h1>
-            <p class="subtitle">Challenge the board and compete with the best</p>
+            <p class="subtitle">Challenge the board and beat the rest!</p>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="openChallengerModal()">Add Challenger</button>
                 <button class="btn btn-secondary" onclick="exportToExcel()">Export to Excel</button>
@@ -602,8 +602,8 @@
                 <div class="accuracy-section">
                     <h3>How many questions did you answer correctly?</h3>
                     <div class="form-group">
-                        <label for="correct-answers">Correct Answers (out of 5)</label>
-                        <input type="number" id="correct-answers" min="0" max="5" value="0" oninput="limitCorrectAnswers()" onchange="limitCorrectAnswers()">
+                        <label for="correct-answers">Correct Answers (out of 3)</label>
+                        <input type="number" id="correct-answers" min="0" max="3" value="0" oninput="limitCorrectAnswers()" onchange="limitCorrectAnswers()">
                     </div>
                     <div class="accuracy-display" id="accuracy-display">0%</div>
                 </div>
@@ -617,7 +617,7 @@
         <div class="modal result-modal">
             <button class="close-btn" onclick="closeResultModal()">&times;</button>
             <div class="modal-header">
-                <h2>Challenge Complete! You've made it</h2>
+                <h2>Challenge Complete!</h2>
             </div>
             <div class="result-icon">🎉</div>
             <div class="result-rank" id="result-rank">
@@ -722,10 +722,17 @@
             const top10 = leaderboard.slice(0, 10);
             
             let html = '';
-            top10.forEach((challenger, index) => {
-                const rank = index + 1;
+            top10.forEach((challenger, displayIndex) => {
+                const rank = displayIndex + 1;
                 const isTop3 = rank <= 3;
                 const isNewEntry = challenger.name === highlightName;
+                
+                // Find the actual index in the full leaderboard array
+                const actualIndex = leaderboard.findIndex(c => 
+                    c.name === challenger.name && 
+                    c.time === challenger.time && 
+                    c.accuracy === challenger.accuracy
+                );
                 
                 html += `
                     <tr class="${isNewEntry ? 'new-entry' : ''}">
@@ -736,7 +743,7 @@
                         <td>${formatTime(challenger.time)}</td>
                         <td style="display: flex; align-items: center; justify-content: space-between;">
                             <span>${challenger.accuracy}%</span>
-                            <button class="delete-btn" onclick="openConfirmDelete(${index})" title="Delete">➖</button>
+                            <button class="delete-btn" onclick="openConfirmDelete(${actualIndex})" title="Delete">➖️</button>
                         </td>
                     </tr>
                 `;
@@ -838,17 +845,29 @@
         // Update accuracy display
         function updateAccuracy() {
             const correct = parseInt(document.getElementById('correct-answers').value) || 0;
-            const accuracy = (correct / 5) * 100;
+            let accuracy = 0;
+            
+            // Calculate accuracy: 0→0%, 1→33%, 2→67%, 3→100%
+            if (correct === 0) {
+                accuracy = 0;
+            } else if (correct === 1) {
+                accuracy = 33;
+            } else if (correct === 2) {
+                accuracy = 67;
+            } else if (correct === 3) {
+                accuracy = 100;
+            }
+            
             document.getElementById('accuracy-display').textContent = accuracy + '%';
         }
 
-        // Limit correct answers to max 5
+        // Limit correct answers to max 3
         function limitCorrectAnswers() {
             const input = document.getElementById('correct-answers');
             let value = parseInt(input.value) || 0;
             
-            if (value > 5) {
-                input.value = 5;
+            if (value > 3) {
+                input.value = 3;
             } else if (value < 0) {
                 input.value = 0;
             }
@@ -860,12 +879,24 @@
         function submitChallenge() {
             const correct = parseInt(document.getElementById('correct-answers').value) || 0;
             
-            if (correct < 0 || correct > 5) {
-                alert('Please enter a valid number between 0 and 5.');
+            if (correct < 0 || correct > 3) {
+                alert('Please enter a valid number between 0 and 3.');
                 return;
             }
 
-            currentChallenger.accuracy = (correct / 5) * 100;
+            // Calculate accuracy: 0→0%, 1→33%, 2→67%, 3→100%
+            let accuracy = 0;
+            if (correct === 0) {
+                accuracy = 0;
+            } else if (correct === 1) {
+                accuracy = 33;
+            } else if (correct === 2) {
+                accuracy = 67;
+            } else if (correct === 3) {
+                accuracy = 100;
+            }
+            
+            currentChallenger.accuracy = accuracy;
             
             // Add to leaderboard
             leaderboard.push({
