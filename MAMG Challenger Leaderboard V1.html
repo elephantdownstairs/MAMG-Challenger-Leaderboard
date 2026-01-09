@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAMG Challenger Leaderboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-reset {
+            background: #ff4444;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .btn-reset:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: #FFD000;
+            color: #1a1a1a;
+            box-shadow: 0 4px 15px rgba(255, 208, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #FFDB4D;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 208, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #FFD000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: #2d2d2d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 20px;
+        }
+
+        .leaderboard-table thead th {
+            background: #1a1a1a;
+            color: #FFD000;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-table thead th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .leaderboard-table thead th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .leaderboard-table tbody tr {
+            background: #f8f8f8;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: #fff9e6;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard-table tbody tr.new-entry {
+            animation: highlightEntry 2s ease;
+        }
+
+        @keyframes highlightEntry {
+            0%, 100% {
+                background: #f8f8f8;
+            }
+            50% {
+                background: #fffacd;
+                box-shadow: 0 0 20px rgba(255, 208, 0, 0.5);
+            }
+        }
+
+        .leaderboard-table tbody td {
+            padding: 20px 15px;
+            border: none;
+        }
+
+        .leaderboard-table tbody tr td:first-child {
+            border-radius: 10px 0 0 10px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #FFD000;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard-table tbody tr td:last-child {
+            border-radius: 0 10px 10px 0;
+            position: relative;
+        }
+
+        .row-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .row-wrapper table {
+            flex: 1;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #1a1a1a;
+            color: #FFD000;
+            border-radius: 50%;
+            font-weight: 700;
+        }
+
+        .rank-badge.top-3 {
+            background: linear-gradient(135deg, #FFD000 0%, #FFA500 100%);
+            color: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(255, 208, 0, 0.3);
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #1a1a1a;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: #1a1a1a;
+            background: #f0f0f0;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #FFD000;
+            box-shadow: 0 0 0 3px rgba(255, 208, 0, 0.1);
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            border: 3px solid #FFD000;
+        }
+
+        .timer-display .time {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-display .label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .accuracy-section {
+            background: #f8f8f8;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .accuracy-section h3 {
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .accuracy-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFD000;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-modal {
+            text-align: center;
+        }
+
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .result-stats {
+            background: #f8f8f8;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .result-stats .stat {
+            margin: 15px 0;
+        }
+
+        .result-stats .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-stats .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-top: 5px;
+        }
+
+        .result-rank {
+            background: linear-gradient(135deg, #FFD000 0%, #FFA500 100%);
+            color: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(255, 208, 0, 0.3);
+        }
+
+        .confirm-dialog {
+            text-align: center;
+        }
+
+        .confirm-dialog p {
+            font-size: 1.1rem;
+            color: #666;
+            margin: 25px 0;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #cc0000;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #1a1a1a;
+        }
+
+        .btn-cancel:hover {
+            background: #d0d0d0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+
+            .leaderboard-table {
+                font-size: 0.85rem;
+            }
+
+            .leaderboard-table thead th,
+            .leaderboard-table tbody td {
+                padding: 10px 8px;
+            }
+
+            .timer-display .time {
+                font-size: 2.5rem;
+            }
+
+            .modal {
+                padding: 25px;
+                width: 95%;
+            }
+        }
+
+        /* Number input styling */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 MAMG Challenger Leaderboard</h1>
+            <p class="subtitle">Challenge the board and compete with the best</p>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="openChallengerModal()">Add Challenger</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()">Export to Excel</button>
+                <button class="btn btn-reset" onclick="openResetConfirmModal()">Reset Leaderboard</button>
+            </div>
+        </div>
+
+        <div id="leaderboard-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Leaderboard entries will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Challenger Modal -->
+    <div id="challenger-modal" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeChallengerModal()">&times;</button>
+            <div class="modal-header">
+                <h2>New Challenger</h2>
+            </div>
+
+            <div id="step-name">
+                <div class="form-group">
+                    <label for="challenger-name">Challenger Name *</label>
+                    <input type="text" id="challenger-name" placeholder="Enter your name" autocomplete="off">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="startChallenge()">Start Timer</button>
+            </div>
+
+            <div id="step-timer" style="display: none;">
+                <div class="timer-display">
+                    <div class="time" id="timer-display">00:00.000</div>
+                    <div class="label">Elapsed Time</div>
+                </div>
+                <div class="timer-controls">
+                    <button class="btn btn-danger" onclick="stopTimer()">Stop Timer</button>
+                </div>
+            </div>
+
+            <div id="step-accuracy" style="display: none;">
+                <div class="accuracy-section">
+                    <h3>How many questions did you answer correctly?</h3>
+                    <div class="form-group">
+                        <label for="correct-answers">Correct Answers (out of 5)</label>
+                        <input type="number" id="correct-answers" min="0" max="5" value="0" oninput="limitCorrectAnswers()" onchange="limitCorrectAnswers()">
+                    </div>
+                    <div class="accuracy-display" id="accuracy-display">0%</div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="submitChallenge()">Submit Score</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal result-modal">
+            <button class="close-btn" onclick="closeResultModal()">&times;</button>
+            <div class="modal-header">
+                <h2>Challenge Complete! You've made it</h2>
+            </div>
+            <div class="result-icon">🎉</div>
+            <div class="result-rank" id="result-rank">
+                Your Rank: #--
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="closeResultModal()">View Leaderboard</button>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal confirm-dialog">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+            </div>
+            <p>Are you sure you want to delete this challenger from the leaderboard?</p>
+            <div class="confirm-actions">
+                <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button class="btn btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Reset Modal -->
+    <div id="reset-modal" class="modal-overlay">
+        <div class="modal confirm-dialog">
+            <div class="modal-header">
+                <h2>Reset Leaderboard</h2>
+            </div>
+            <p>Are you sure you want to clear all participants and reset the leaderboard? This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button class="btn btn-danger" onclick="confirmReset()">Reset All</button>
+                <button class="btn btn-cancel" onclick="closeResetConfirmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let leaderboard = [];
+        let timerInterval = null;
+        let startTime = 0;
+        let elapsedTime = 0;
+        let currentChallenger = {
+            name: '',
+            time: 0,
+            accuracy: 0
+        };
+        let deleteIndex = -1;
+
+        // Load leaderboard from localStorage on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLeaderboard();
+            renderLeaderboard();
+        });
+
+        // Load leaderboard from localStorage
+        function loadLeaderboard() {
+            const saved = localStorage.getItem('mamg-leaderboard');
+            if (saved) {
+                leaderboard = JSON.parse(saved);
+            }
+        }
+
+        // Save leaderboard to localStorage
+        function saveLeaderboard() {
+            localStorage.setItem('mamg-leaderboard', JSON.stringify(leaderboard));
+        }
+
+        // Sort leaderboard by accuracy (desc) then by time (asc)
+        function sortLeaderboard() {
+            leaderboard.sort((a, b) => {
+                if (b.accuracy !== a.accuracy) {
+                    return b.accuracy - a.accuracy;
+                }
+                return a.time - b.time;
+            });
+        }
+
+        // Render leaderboard table
+        function renderLeaderboard(highlightName = null) {
+            const tbody = document.getElementById('leaderboard-body');
+            
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏁</div>
+                                <h3>No challengers yet</h3>
+                                <p>Be the first to take the challenge!</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            sortLeaderboard();
+            
+            // Display only top 10
+            const top10 = leaderboard.slice(0, 10);
+            
+            let html = '';
+            top10.forEach((challenger, index) => {
+                const rank = index + 1;
+                const isTop3 = rank <= 3;
+                const isNewEntry = challenger.name === highlightName;
+                
+                html += `
+                    <tr class="${isNewEntry ? 'new-entry' : ''}">
+                        <td>
+                            <span class="rank-badge ${isTop3 ? 'top-3' : ''}">${rank}</span>
+                        </td>
+                        <td>${escapeHtml(challenger.name)}</td>
+                        <td>${formatTime(challenger.time)}</td>
+                        <td style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>${challenger.accuracy}%</span>
+                            <button class="delete-btn" onclick="openConfirmDelete(${index})" title="Delete">➖</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // Format time in mm:ss.SSS
+        function formatTime(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            const milliseconds = ms % 1000;
+            
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Open challenger modal
+        function openChallengerModal() {
+            document.getElementById('challenger-modal').classList.add('active');
+            document.getElementById('step-name').style.display = 'block';
+            document.getElementById('step-timer').style.display = 'none';
+            document.getElementById('step-accuracy').style.display = 'none';
+            document.getElementById('challenger-name').value = '';
+            document.getElementById('challenger-name').focus();
+        }
+
+        // Close challenger modal
+        function closeChallengerModal() {
+            document.getElementById('challenger-modal').classList.remove('active');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            resetChallenger();
+        }
+
+        // Reset challenger state
+        function resetChallenger() {
+            currentChallenger = {
+                name: '',
+                time: 0,
+                accuracy: 0
+            };
+            elapsedTime = 0;
+            startTime = 0;
+            document.getElementById('timer-display').textContent = '00:00.000';
+            document.getElementById('correct-answers').value = '0';
+            document.getElementById('accuracy-display').textContent = '0%';
+        }
+
+        // Start challenge (timer)
+        function startChallenge() {
+            const name = document.getElementById('challenger-name').value.trim();
+            
+            if (!name) {
+                alert('Please enter your name before starting the challenge.');
+                return;
+            }
+
+            currentChallenger.name = name;
+            
+            // Show timer step
+            document.getElementById('step-name').style.display = 'none';
+            document.getElementById('step-timer').style.display = 'block';
+            
+            // Start timer
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 10);
+        }
+
+        // Update timer display
+        function updateTimer() {
+            elapsedTime = Date.now() - startTime;
+            document.getElementById('timer-display').textContent = formatTime(elapsedTime);
+        }
+
+        // Stop timer
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            currentChallenger.time = elapsedTime;
+            
+            // Show accuracy step
+            document.getElementById('step-timer').style.display = 'none';
+            document.getElementById('step-accuracy').style.display = 'block';
+        }
+
+        // Update accuracy display
+        function updateAccuracy() {
+            const correct = parseInt(document.getElementById('correct-answers').value) || 0;
+            const accuracy = (correct / 5) * 100;
+            document.getElementById('accuracy-display').textContent = accuracy + '%';
+        }
+
+        // Limit correct answers to max 5
+        function limitCorrectAnswers() {
+            const input = document.getElementById('correct-answers');
+            let value = parseInt(input.value) || 0;
+            
+            if (value > 5) {
+                input.value = 5;
+            } else if (value < 0) {
+                input.value = 0;
+            }
+            
+            updateAccuracy();
+        }
+
+        // Submit challenge
+        function submitChallenge() {
+            const correct = parseInt(document.getElementById('correct-answers').value) || 0;
+            
+            if (correct < 0 || correct > 5) {
+                alert('Please enter a valid number between 0 and 5.');
+                return;
+            }
+
+            currentChallenger.accuracy = (correct / 5) * 100;
+            
+            // Add to leaderboard
+            leaderboard.push({
+                name: currentChallenger.name,
+                time: currentChallenger.time,
+                accuracy: currentChallenger.accuracy
+            });
+            
+            saveLeaderboard();
+            
+            // Calculate rank
+            sortLeaderboard();
+            const rank = leaderboard.findIndex(c => 
+                c.name === currentChallenger.name && 
+                c.time === currentChallenger.time && 
+                c.accuracy === currentChallenger.accuracy
+            ) + 1;
+            
+            // Close challenger modal and show result
+            closeChallengerModal();
+            showResultModal(rank);
+            
+            // Render leaderboard with highlight
+            renderLeaderboard(currentChallenger.name);
+        }
+
+        // Show result modal
+        function showResultModal(rank) {
+            document.getElementById('result-rank').textContent = `Your Rank: #${rank}`;
+            document.getElementById('result-modal').classList.add('active');
+        }
+
+        // Close result modal
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.remove('active');
+        }
+
+        // Open confirm delete modal
+        function openConfirmDelete(index) {
+            deleteIndex = index;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        // Close confirm modal
+        function closeConfirmModal() {
+            deleteIndex = -1;
+            document.getElementById('confirm-modal').classList.remove('active');
+        }
+
+        // Confirm delete
+        function confirmDelete() {
+            if (deleteIndex >= 0 && deleteIndex < leaderboard.length) {
+                leaderboard.splice(deleteIndex, 1);
+                saveLeaderboard();
+                renderLeaderboard();
+            }
+            closeConfirmModal();
+        }
+
+        // Open reset confirmation modal
+        function openResetConfirmModal() {
+            document.getElementById('reset-modal').classList.add('active');
+        }
+
+        // Close reset confirmation modal
+        function closeResetConfirmModal() {
+            document.getElementById('reset-modal').classList.remove('active');
+        }
+
+        // Confirm reset leaderboard
+        function confirmReset() {
+            leaderboard = [];
+            saveLeaderboard();
+            renderLeaderboard();
+            closeResetConfirmModal();
+        }
+
+        // Export to Excel (CSV format)
+        function exportToExcel() {
+            if (leaderboard.length === 0) {
+                alert('No data to export. Add some challengers first!');
+                return;
+            }
+
+            sortLeaderboard();
+            
+            // Create CSV content
+            let csv = 'Rank,Name,Time,Accuracy\n';
+            
+            leaderboard.forEach((challenger, index) => {
+                const rank = index + 1;
+                const name = `"${challenger.name.replace(/"/g, '""')}"`;
+                const time = formatTime(challenger.time);
+                const accuracy = challenger.accuracy + '%';
+                
+                csv += `${rank},${name},${time},${accuracy}\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'mamg-leaderboard.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                if (e.target.id === 'challenger-modal') {
+                    closeChallengerModal();
+                } else if (e.target.id === 'result-modal') {
+                    closeResultModal();
+                } else if (e.target.id === 'confirm-modal') {
+                    closeConfirmModal();
+                } else if (e.target.id === 'reset-modal') {
+                    closeResetConfirmModal();
+                }
+            }
+        });
+
+        // Handle Enter key in name input
+        document.getElementById('challenger-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startChallenge();
+            }
+        });
+
+        // Handle Enter key in correct answers input
+        document.getElementById('correct-answers').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitChallenge();
+            }
+        });
+    </script>
+</body>
+</html>
